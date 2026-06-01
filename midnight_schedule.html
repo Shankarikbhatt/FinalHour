@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Midnight Scheduler</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  [data-theme="dark"] {
+    --bg: #0a0a0f;
+    --bg2: #0f172a;
+    --border: #1e293b;
+    --border2: #334155;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --text4: #475569;
+    --tag-bg: #1e293b;
+    --tag-color: #94a3b8;
+    --tag-border: #334155;
+    --progress-track: #1e293b;
+    --motivation-bg: #0f172a;
+    --slot-bg: #0f172a;
+    --slot-done-bg: #0a1628;
+  }
+
+  [data-theme="light"] {
+    --bg: #f1f5f9;
+    --bg2: #ffffff;
+    --border: #e2e8f0;
+    --border2: #cbd5e1;
+    --text: #0f172a;
+    --text2: #475569;
+    --text3: #94a3b8;
+    --text4: #cbd5e1;
+    --tag-bg: #f1f5f9;
+    --tag-color: #475569;
+    --tag-border: #e2e8f0;
+    --progress-track: #e2e8f0;
+    --motivation-bg: #ffffff;
+    --slot-bg: #ffffff;
+    --slot-done-bg: #f8fafc;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  [data-theme="dark"] body {
+    background-image:
+      radial-gradient(ellipse at 20% 20%, #1e1b4b33 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, #0f172a55 0%, transparent 60%);
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .fab-container {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 999;
+  }
+
+  .top-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 99px;
+    border: 1px solid var(--border2);
+    background: var(--bg2);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 20px #00000044;
+    white-space: nowrap;
+  }
+
+  .top-btn:hover {
+    background: var(--border2);
+    color: var(--text);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px #00000066;
+  }
+
+.vitals-box {
+    position: fixed;
+    left: 24px;
+    top: 24px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    padding: 20px 22px;
+    width: 180px;
+    box-shadow: 0 4px 24px #00000055;
+    z-index: 999;
+    animation: fadeDown 0.6s ease;
+  }
+
+  .vitals-header {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border2);
+    padding-bottom: 10px;
+  }
+
+  .vital-row {
+    margin-bottom: 12px;
+  }
+
+  .vital-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 3px;
+  }
+
+  .vital-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+    animation: fadeDown 0.6s ease;
+  }
+
+  .header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #818cf8, #38bdf8, #4ade80);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+
+  .progress-container {
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .progress-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .progress-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.92rem;
+    color: #38bdf8;
+    font-weight: 700;
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 8px;
+    background: var(--progress-track);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #38bdf8, #818cf8);
+    box-shadow: 0 0 12px #38bdf888;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .topics-section {
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-bottom: 12px;
+  }
+
+  .topic-tag {
+    display: inline-block;
+    background: var(--tag-bg);
+    color: var(--tag-color);
+    font-size: 0.78rem;
+    font-family: 'Space Mono', monospace;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin: 4px;
+    border: 1px solid var(--tag-border);
+  }
+
+  .schedule-section {
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  .slot {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--slot-bg);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .study-slot {
+    cursor: pointer;
+  }
+
+  .study-slot:hover {
+    transform: translateX(4px);
+    border-color: var(--border2);
+  }
+
+  .slot.done {
+    background: var(--slot-done-bg);
+    border-color: var(--border);
+    opacity: 0.6;
+  }
+
+  .slot.done .slot-label {
+    color: var(--text4);
+  }
+
+  .slot.done .slot-time {
+    color: var(--text4);
+  }
+
+  .mark-done-btn {
+    position: absolute;
+    right: -80px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #818cf8;
+    color: #ffffff;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .study-slot:hover .mark-done-btn {
+    right: 14px;
+    pointer-events: auto;
+  }
+
+  .slot.done .mark-done-btn {
+    display: none;
+  }
+
+  .slot-icon {
+    font-size: 1.4rem;
+    width: 36px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .slot-info {
+    flex: 1;
+  }
+
+  .slot-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text2);
+    margin-bottom: 4px;
+  }
+
+  .slot-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .slot-timestamp {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: #818cf8;
+    margin-top: 4px;
+  }
+
+  .slot-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
+
+  .motivation-bottom {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 20px 28px;
+    text-align: center;
+    margin: 32px 0 20px;
+    background: var(--motivation-bg);
+    animation: fadeUp 0.6s ease 0.4s both;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 80px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text3);
+    animation: fadeUp 0.6s ease 0.5s both;
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-50%) translateX(-10px); }
+    to { opacity: 1; transform: translateY(-50%) translateX(0); }
+  }
+
+  @media print {
+    .fab-container { display: none; }
+    .vitals-box { display: none; }
+    .mark-done-btn { display: none !important; }
+    body { padding: 20px; }
+    [data-theme="dark"] {
+      --bg: #ffffff;
+      --bg2: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text2: #475569;
+      --slot-bg: #ffffff;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="fab-container">
+    <button class="top-btn" onclick="toggleTheme()">☀ / ☾ Theme</button>
+    <button class="top-btn" onclick="window.print()">🖨 Print</button>
+  </div>
+
+  <div class="vitals-box">
+    <div class="vitals-header">VITALS</div>
+    <div class="vital-row">
+      <div class="vital-label">Sleep Plan</div>
+      <div class="vital-value" style="color:#38bdf8;">Sleep Split</div>
+    </div>
+    <div class="vital-row">
+      <div class="vital-label">Breaks</div>
+      <div class="vital-value" style="color:#38bdf8;">Included</div>
+    </div>
+    <div class="vital-row">
+      <div class="vital-label">Sleep Hours</div>
+      <div class="vital-value" style="color:#f87171;">Not Included</div>
+    </div>
+    <div class="vital-row">
+      <div class="vital-label">Prep Level</div>
+      <div class="vital-value" style="color:#f87171;">Cold start</div>
+    </div>
+  </div>
+
+<div class="container">
+
+  <div class="header">
+    <h1>Operation: Don't Fail 🎯</h1>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-header">
+      <span class="progress-label">Progress</span>
+      <span class="progress-count" id="progress-count">0 / 3 topics done</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <div class="topics-section">
+    <div class="section-title">Pending Topics</div>
+    <span class='topic-tag'>Unit 1 - Part A</span><span class='topic-tag'>Unit 1 - Part B</span><span class='topic-tag'>Unit 1 - Part C</span>
+  </div>
+
+  <div class="schedule-section">
+    <div class="section-title">Your Schedule</div>
+    
+        <div class="slot study-slot" id="slot-0" style="border-left: 4px solid #4ade80;" onclick="toggleDone(0, 3)">
+            <div class="slot-icon">📖</div>
+            <div class="slot-info">
+                <div class="slot-time" id="time-0">09:45 AM — 10:15 AM</div>
+                <div class="slot-label" id="label-0">Unit 1 - Part A</div>
+                <div class="slot-timestamp" id="ts-0" style="display:none;"></div>
+            </div>
+            <div class="slot-tag" style="background:#4ade8020; color:#4ade80;">STUDY</div>
+            <div class="mark-done-btn" id="btn-0">✓ Done</div>
+        </div>
+        
+        <div class="slot" style="border-left: 4px solid #facc15;">
+            <div class="slot-icon">☕</div>
+            <div class="slot-info">
+                <div class="slot-time">10:15 AM — 10:20 AM</div>
+                <div class="slot-label">Break</div>
+            </div>
+            <div class="slot-tag" style="background:#facc1520; color:#facc15;">BREAK</div>
+        </div>
+        
+        <div class="slot study-slot" id="slot-1" style="border-left: 4px solid #4ade80;" onclick="toggleDone(1, 3)">
+            <div class="slot-icon">📖</div>
+            <div class="slot-info">
+                <div class="slot-time" id="time-1">10:20 AM — 11:20 AM</div>
+                <div class="slot-label" id="label-1">Unit 1 - Part B</div>
+                <div class="slot-timestamp" id="ts-1" style="display:none;"></div>
+            </div>
+            <div class="slot-tag" style="background:#4ade8020; color:#4ade80;">STUDY</div>
+            <div class="mark-done-btn" id="btn-1">✓ Done</div>
+        </div>
+        
+        <div class="slot" style="border-left: 4px solid #facc15;">
+            <div class="slot-icon">☕</div>
+            <div class="slot-info">
+                <div class="slot-time">11:20 AM — 11:25 AM</div>
+                <div class="slot-label">Break</div>
+            </div>
+            <div class="slot-tag" style="background:#facc1520; color:#facc15;">BREAK</div>
+        </div>
+        
+        <div class="slot study-slot" id="slot-2" style="border-left: 4px solid #4ade80;" onclick="toggleDone(2, 3)">
+            <div class="slot-icon">📖</div>
+            <div class="slot-info">
+                <div class="slot-time" id="time-2">11:25 AM — 12:00 PM</div>
+                <div class="slot-label" id="label-2">Unit 1 - Part C</div>
+                <div class="slot-timestamp" id="ts-2" style="display:none;"></div>
+            </div>
+            <div class="slot-tag" style="background:#4ade8020; color:#4ade80;">STUDY</div>
+            <div class="mark-done-btn" id="btn-2">✓ Done</div>
+        </div>
+        
+        <div class="slot" style="border-left: 4px solid #fb923c;">
+            <div class="slot-icon">🔄</div>
+            <div class="slot-info">
+                <div class="slot-time">12:00 PM — 02:00 AM</div>
+                <div class="slot-label">Time to cover the missed questions</div>
+            </div>
+            <div class="slot-tag" style="background:#fb923c20; color:#fb923c;">FREE</div>
+        </div>
+        
+        <div class="slot" style="border-left: 4px solid #818cf8;">
+            <div class="slot-icon">😴</div>
+            <div class="slot-info">
+                <div class="slot-time">02:00 AM — 05:00 AM</div>
+                <div class="slot-label">Sleep</div>
+            </div>
+            <div class="slot-tag" style="background:#818cf820; color:#818cf8;">SLEEP</div>
+        </div>
+        
+        <div class="slot" style="border-left: 4px solid #38bdf8;">
+            <div class="slot-icon">⚡</div>
+            <div class="slot-info">
+                <div class="slot-time">05:00 AM — 06:00 AM</div>
+                <div class="slot-label">Final Revision — All Topics</div>
+            </div>
+            <div class="slot-tag" style="background:#38bdf820; color:#38bdf8;">REVISION</div>
+        </div>
+        
+        <div class="slot" style="border-left: 4px solid #f472b6;">
+            <div class="slot-icon">🚌</div>
+            <div class="slot-info">
+                <div class="slot-time">06:00 AM</div>
+                <div class="slot-label">Leave for College</div>
+            </div>
+            <div class="slot-tag" style="background:#f472b620; color:#f472b6;">LEAVE</div>
+        </div>
+        
+  </div>
+
+  <div class="motivation-bottom">"Study hard, sleep fast, pretend you're fine. Classic!!"</div>
+
+  <div class="footer">
+    Generated at 09:45 AM · Good luck · You've got this
+  </div>
+
+</div>
+
+<script>
+  var totalStudy = 3;
+  var doneCount = 0;
+  var doneSlots = {};
+
+  function toggleTheme() {
+    var html = document.documentElement;
+    var current = html.getAttribute('data-theme');
+    html.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+  }
+
+  function toggleDone(id, total) {
+    if (doneSlots[id]) return;
+
+    doneSlots[id] = true;
+    doneCount++;
+
+    var slot = document.getElementById('slot-' + id);
+    slot.classList.add('done');
+
+    var now = new Date();
+    var hours = now.getHours();
+    var mins = now.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    mins = mins < 10 ? '0' + mins : mins;
+    var timeStr = hours + ':' + mins + ' ' + ampm;
+
+    var ts = document.getElementById('ts-' + id);
+    ts.style.display = 'block';
+    ts.innerHTML = '✓ Done at ' + timeStr;
+
+    var pct = (doneCount / totalStudy) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-count').innerHTML = doneCount + ' / ' + totalStudy + ' topics done';
+
+    if (doneCount === totalStudy) {
+      document.getElementById('progress-count').innerHTML = '🎉 All topics done! Go get some rest.';
+    }
+  }
+</script>
+
+</body>
+</html>
