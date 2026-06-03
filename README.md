@@ -1,8 +1,8 @@
-# FinalHour ⏰
+# ⏰ FinalHour
 
 > *A smart last-minute study planner for the night before your exam.*
 
-Built entirely from scratch in Python — no AI assistance, no templates.
+Built entirely from scratch in Python — no AI assistance, no templates, no shortcuts.
 
 ---
 
@@ -17,7 +17,7 @@ You tell it:
 
 It gives you:
 - A smart timetable with study slots, breaks, nap time and revision
-- Part-based time allocation — Part B gets more time because it deserves it
+- Part-based time allocation — Part B gets 60 mins because it deserves it
 - Dynamic nap duration based on how heavy your workload is
 - A beautiful dark-themed HTML page that auto-opens in your browser
 
@@ -29,38 +29,59 @@ It gives you:
 - Interactive HTML output with progress tracking and mark-as-done
 - Cyan-to-purple progress bar that fills as you complete topics
 - Completion timestamps for each topic
+- VITALS panel — your plan stats always visible on screen
 - Dark / Light theme toggle
-- Print-ready layout
-- Combo-specific headers and motivational lines for every scenario
+- Print-ready layout with floating action buttons
+- Combo-specific headers and motivational lines for every scenario (9 unique combinations)
 - Packaged as a standalone `.exe` — no Python installation needed
 
 ---
 
 ## How to run
 
-**Option 1 — Run the exe (recommended):**
-Download `FinalHour.exe` and double click. No setup needed.
+**Option 1 — Run the exe (recommended, no setup needed):**
+
+Download `night scheduler.exe` and double click. That's it.
 
 **Option 2 — Run the Python file:**
-pip install datetime
+
+```bash
+pip install pyinstaller
 python "night scheduler.py"
+```
+
+---
+
+## Sleep Modes
+
+| Mode | How it works |
+|---|---|
+| All Nighter | Studies from now until 2:30AM, 90-min power nap, revision until 6AM |
+| Early Wake | Sleeps now, wakes at your chosen time, studies until 6AM |
+| Sleep Split | Studies until 2AM, sleeps 2-5AM, revision 5-6AM |
+
+---
+
+## Study Time by Part
+
+| Part | Time Allocated |
+|---|---|
+| Part A | 30 minutes |
+| Part B | 60 minutes |
+| Part C | 35 minutes |
 
 ---
 
 ## Built with
 
 - Python 3
-- HTML + CSS + JavaScript (for the output page)
+- HTML + CSS + JavaScript (output page)
 - No external AI tools — every line written and debugged manually
-
----
-
-## Screenshots
-
-*(Coming soon)*
 
 ---
 
 ## About
 
 Built during my first year engineering holidays as a real solution to a problem every student faces the night before an exam. Deployed as a standalone executable so anyone can use it without any technical setup.
+
+*First year CS student — Easwari Engineering College, Chennai*
