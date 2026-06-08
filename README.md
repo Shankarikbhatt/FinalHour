@@ -4,6 +4,8 @@
 
 Built entirely from scratch in Python — no AI assistance, no templates, no shortcuts.
 
+**[Jump to Run Instructions](#-how-to-run)**
+
 ---
 
 ## What it does
@@ -37,7 +39,7 @@ It gives you:
 
 ---
 
-## How to run (Windows)
+## How to run
 
 
 Download the night scheduler.exe file from this repository.
