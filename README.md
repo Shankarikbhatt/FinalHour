@@ -42,11 +42,11 @@ It gives you:
 ## How to run
 
 
-1.Download the night scheduler.exe file from this repository.
+1. Download the night scheduler.exe file from this repository.
 
-2.Double-click the .exe file to launch the planner interface.
+2. Double-click the .exe file to launch the planner interface.
 
-3.Fill in your sleep plan and topics to generate your interactive schedule instantly.
+3. Fill in your sleep plan and topics to generate your interactive schedule instantly.
 
 ## Sleep Modes
 
