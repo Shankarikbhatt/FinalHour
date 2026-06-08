@@ -4,7 +4,7 @@
 
 Built entirely from scratch in Python — no AI assistance, no templates, no shortcuts.
 
-**[Jump to Run Instructions](#-How-to-run)**
+**[Jump to Run Instructions](#-how-to-run)**
 
 ---
 
