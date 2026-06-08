@@ -37,20 +37,14 @@ It gives you:
 
 ---
 
-## How to run
+## How to run(Windows)
 
-**Option 1 — Run the exe (recommended, no setup needed):**
 
-Download `night scheduler.exe` and double click. That's it.
+Download the night scheduler.exe file from this repository.
 
-**Option 2 — Run the Python file:**
+Double-click the .exe file to launch the planner interface.
 
-```bash
-pip install pyinstaller
-python "night scheduler.py"
-```
-
----
+Fill in your sleep plan and topics to generate your interactive schedule instantly.
 
 ## Sleep Modes
 
