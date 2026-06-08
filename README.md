@@ -37,7 +37,7 @@ It gives you:
 
 ---
 
-## How to run(Windows)
+## How to run (Windows)
 
 
 Download the night scheduler.exe file from this repository.
