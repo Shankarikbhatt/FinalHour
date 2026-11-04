@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinalHour — Midnight Scheduler</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a0a0f;--panel:#0f172a;--border:#334155;--text:#e2e8f0;--muted:#94a3b8;--accent:#818cf8;--green:#4ade80;--yellow:#facc15;--red:#f87171;--blue:#38bdf8}
+[data-theme="light"]{--bg:#f1f5f9;--panel:#fff;--border:#cbd5e1;--text:#0f172a;--muted:#475569}
+body{background:var(--bg);color:var(--text);font-family:Syne,sans-serif;min-height:100vh;padding:28px 16px 60px;background-image:radial-gradient(ellipse at 15% 10%,#312e8130,transparent 55%),radial-gradient(ellipse at 85% 90%,#0f766e20,transparent 55%)}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.wrap{max-width:850px;margin:auto}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.brand{font:700 .78rem 'Space Mono',monospace;letter-spacing:.18em;color:var(--muted)}
+.btn{border:1px solid var(--border);border-radius:999px;padding:10px 16px;background:var(--panel);color:var(--text);font:700 .72rem 'Space Mono',monospace}
+.btn:hover{border-color:var(--accent)}
+.primary{background:linear-gradient(120deg,#6366f1,#0ea5e9);border:0;color:white;padding:14px 22px;font:700 .82rem 'Space Mono',monospace;border-radius:10px}
+.secondary{background:transparent;border:1px solid var(--border);color:var(--text);padding:12px 18px;border-radius:10px;font:700 .75rem 'Space Mono',monospace}
+.hero{text-align:center;margin:20px 0 30px}
+.eyebrow{font:700 .68rem 'Space Mono',monospace;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:12px}
+h1{font-size:clamp(2rem,6vw,3.1rem);line-height:1.1;font-weight:800;background:linear-gradient(120deg,#a5b4fc,#38bdf8,#4ade80);-webkit-background-clip:text;background-clip:text;color:transparent}
+.subtitle{color:var(--muted);margin-top:12px;font-size:.95rem}
+.panel{background:color-mix(in srgb,var(--panel) 94%,transparent);border:1px solid var(--border);border-radius:18px;padding:clamp(18px,4vw,28px);margin:18px 0;box-shadow:0 12px 36px #0002}
+.step-title{font-size:1.08rem;font-weight:800;margin-bottom:6px}
+.help{font-size:.82rem;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.field{margin:16px 0}
+label,.label{display:block;font-size:.82rem;font-weight:700;margin-bottom:8px}
+input[type=number],select{width:100%;max-width:260px;padding:12px;border-radius:9px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+.units{display:grid;gap:12px}
+.unit{border:1px solid var(--border);border-radius:12px;padding:15px;background:var(--bg)}
+.unit-head{font:700 .78rem 'Space Mono',monospace;color:var(--blue);margin-bottom:12px}
+.parts{display:flex;flex-wrap:wrap;gap:10px}
+.check{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:.83rem}
+.check input{accent-color:#818cf8;width:16px;height:16px}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.choice{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--border);border-radius:11px;padding:13px;background:var(--bg);cursor:pointer}
+.choice input{margin-top:3px;accent-color:#818cf8}
+.choice strong{display:block;font-size:.85rem}
+.choice small{display:block;color:var(--muted);font-size:.73rem;margin-top:4px;line-height:1.4}
+.hidden{display:none!important}
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:22px}
+.notice{color:var(--yellow);font-size:.8rem;margin-top:10px}
+.error{color:var(--red);font-size:.82rem;margin-top:10px}
+.summary{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.pill{font: .7rem 'Space Mono',monospace;color:var(--muted);background:var(--bg);border:1px solid var(--border);padding:7px 10px;border-radius:999px}
+.result-head{text-align:center;margin:12px 0 22px}
+.result-head h2{font-size:clamp(1.5rem,5vw,2.3rem);color:#a5b4fc}
+.result-head p{color:var(--muted);margin-top:8px}
+.vitals{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin:18px 0}
+.vital{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px}
+.vital small{display:block;color:var(--muted);font: .62rem 'Space Mono',monospace;text-transform:uppercase;margin-bottom:6px}
+.vital strong{font-size:.85rem}
+.progress{height:8px;background:var(--border);border-radius:99px;overflow:hidden;margin:10px 0 18px}
+.progress>div{height:100%;width:0;background:linear-gradient(90deg,#38bdf8,#818cf8);transition:width .25s}
+.slot{display:flex;align-items:center;gap:13px;background:var(--bg);border:1px solid var(--border);border-left:4px solid var(--slot-color);border-radius:11px;padding:14px;margin:9px 0}
+.slot-icon{font-size:1.25rem}
+.slot-info{flex:1;min-width:0}
+.slot-time{font:700 .78rem 'Space Mono',monospace;color:var(--muted);margin-bottom:4px}
+.slot-label{font-weight:700;font-size:.9rem}
+.tag{font:700 .62rem 'Space Mono',monospace;color:var(--slot-color);background:color-mix(in srgb,var(--slot-color) 13%,transparent);padding:5px 8px;border-radius:99px}
+.slot.study{cursor:pointer}
+.slot.done{opacity:.55}
+.slot.done .slot-label{text-decoration:line-through}
+.motivation{text-align:center;padding:20px;border:1px solid var(--border);border-radius:12px;margin-top:22px;font:700 .9rem 'Space Mono',monospace;line-height:1.5}
+.footer{text-align:center;color:var(--muted);font: .68rem 'Space Mono',monospace;margin:24px 0}
+@media(max-width:520px){.slot{gap:8px;padding:11px}.tag{font-size:.55rem}.slot-label{font-size:.8rem}.topbar{margin-bottom:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">FINALHOUR / MIDNIGHT SCHEDULER</div>
+    <button class="btn" id="themeBtn" type="button">☀ / ☾ THEME</button>
+  </div>
+
+  <main id="inputScreen">
+    <header class="hero">
+      <div class="eyebrow">Your exam-eve survival planner</div>
+      <h1>Let's build your<br>battle plan.</h1>
+      <p class="subtitle">Tell us what's pending. FinalHour will organise the time you have.</p>
+    </header>
+
+    <section class="panel">
+      <div class="step-title">01 / Pending portions</div>
+      <p class="help">Enter the number of units, then select every part you still need to cover.</p>
+      <div class="field">
+        <label for="unitCount">How many units do you need to cover?</label>
+        <input id="unitCount" type="number" min="1" max="20" value="4">
+      </div>
+      <div id="units" class="units"></div>
+      <div id="topicError" class="error" role="alert"></div>
+    </section>
+
+    <section class="panel">
+      <div class="step-title">02 / Sleep plan</div>
+      <p class="help">Choose how you plan to manage sleep tonight.</p>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="sleepPlan" value="All Nighter"><span><strong>All Nighter</strong><small>Study through the night, with a power nap.</small></span></label>
+        <label class="choice"><input type="radio" name="sleepPlan" value="Early Wake" checked><span><strong>Early Wake</strong><small>Sleep or rest now and wake up early to study.</small></span></label>
+        <label class="choice"><input type="radio" name="sleepPlan" value="Sleep Split"><span><strong>Sleep Split</strong><small>Study first, take a sleep break, then revise.</small></span></label>
+      </div>
+      <div id="wakeFields" class="field">
+        <label for="wakeHour">What time will you wake up?</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <select id="wakeHour" aria-label="Wake-up hour">
+            <option value="2">2 AM</option><option value="3">3 AM</option><option value="4" selected>4 AM</option><option value="5">5 AM</option><option value="6">6 AM</option><option value="7">7 AM</option><option value="8">8 AM</option><option value="9">9 AM</option>
+          </select>
+          <select id="wakeMinute" aria-label="Wake-up minutes">
+            <option value="0">:00</option><option value="15">:15</option><option value="30">:30</option><option value="45">:45</option>
+          </select>
+        </div>
+      </div>
+      <p class="notice">The original scheduling rules are retained, including the 2:30 AM power nap for All Nighter and the 2–5 AM sleep window for Sleep Split.</p>
+    </section>
+
+    <section class="panel">
+      <div class="step-title">03 / Preparation level</div>
+      <p class="help">How much of the syllabus have you already completed?</p>
+      <div class="choices">
+        <label class="choice"><input type="radio" name="prep" value="Cold start" checked><span><strong>Nothing done yet</strong><small>Starting from scratch.</small></span></label>
+        <label class="choice"><input type="radio" name="prep" value="Partial"><span><strong>Partially done</strong><small>Some topics are already covered.</small></span></label>
+        <label class="choice"><input type="radio" name="prep" value="Revision"><span><strong>Just need revision</strong><small>You've studied; now you need a recap.</small></span></label>
+      </div>
+      <div class="actions"><button class="primary" id="generateBtn" type="button">GENERATE MY SCHEDULE →</button></div>
+      <div id="formError" class="error" role="alert"></div>
+    </section>
+    <div class="footer">FINALHOUR · PLAN SMART · KEEP GOING</div>
+  </main>
+
+  <main id="resultScreen" class="hidden">
+    <div class="result-head">
+      <div class="eyebrow">Your plan is ready</div>
+      <h2 id="resultTitle"></h2>
+      <p id="resultMotivation"></p>
+    </div>
+    <section class="panel">
+      <div class="step-title">Your plan at a glance</div>
+      <div class="vitals" id="vitals"></div>
+      <div class="summary" id="topicSummary"></div>
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+        <strong style="font-size:.82rem">Study progress</strong><span id="progressCount" class="pill">0 topics done</span>
+      </div>
+      <div class="progress"><div id="progressFill"></div></div>
+      <div class="step-title" style="margin:20px 0 12px">Your schedule</div>
+      <div id="schedule"></div>
+      <div class="motivation" id="bottomMotivation"></div>
+      <div class="actions">
+        <button class="secondary" id="editBtn" type="button">← EDIT INPUTS</button>
+        <button class="secondary" id="printBtn" type="button">PRINT SCHEDULE</button>
+      </div>
+    </section>
+    <div class="footer" id="generatedAt"></div>
+  </main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let completed = new Set();
+let studyTotal = 0;
+
+function renderUnitInputs() {
+  const count = Math.max(1, Math.min(20, Number($('unitCount').value) || 1));
+  $('unitCount').value = count;
+  const previous = new Set([...document.querySelectorAll('.topic-check:checked')].map(x => x.value));
+  $('units').innerHTML = '';
+  for (let u=1; u<=count; u++) {
+    const box=document.createElement('div'); box.className='unit';
+    const head=document.createElement('div'); head.className='unit-head'; head.textContent=`UNIT ${u}`;
+    const parts=document.createElement('div'); parts.className='parts';
+    ['A','B','C'].forEach(part=>{
+      const label=document.createElement('label'); label.className='check';
+      const cb=document.createElement('input'); cb.type='checkbox'; cb.className='topic-check'; cb.value=`Unit ${u} - Part ${part}`;
+      cb.checked=previous.has(cb.value);
+      const span=document.createElement('span'); span.textContent=`Part ${part}`;
+      label.append(cb,span); parts.append(label);
+    });
+    box.append(head,parts); $('units').append(box);
+  }
+}
+$('unitCount').addEventListener('change',renderUnitInputs);
+$('unitCount').addEventListener('input',renderUnitInputs);
+renderUnitInputs();
+
+document.querySelectorAll('input[name="sleepPlan"]').forEach(r=>r.addEventListener('change',()=>{
+  $('wakeFields').classList.toggle('hidden',document.querySelector('input[name="sleepPlan"]:checked').value!=='Early Wake');
+}));
+
+$('themeBtn').addEventListener('click',()=>{
+  document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';
+});
+
+const addMinutes=(d,m)=>new Date(d.getTime()+m*60000);
+function nextTime(now,hour,minute=0){
+  const d=new Date(now); d.setHours(hour,minute,0,0); if(d<=now)d.setDate(d.getDate()+1); return d;
+}
+function duration(topic){return topic.includes('Part A')?30:topic.includes('Part B')?60:35}
+function napDuration(topics){return topics.length<=2?90:topics.length<=4?60:45}
+function breakDuration(prep){return prep==='Cold start'?5:prep==='Partial'?8:10}
+function timeText(d){return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}
+function getCombo(plan,prep){
+ const combos={
+ 'All Nighter|Cold start':['Panic Mode: Activated 🚨','You chose chaos. My respect. Now open that damn PDF!!'],
+ 'All Nighter|Partial':['Midnight Mission Briefing 🌙','You started. Tonight you finish. No excuses!!'],
+ 'All Nighter|Revision':['The Night Before™ ✨','You basically know this. Tonight is just a formality!!'],
+ 'Early Wake|Cold start':['Your Exam Eve Survival Guide 📋','Sleep now. The panic is scheduled for later!!'],
+ 'Early Wake|Partial':['Last Minute Legend in the Making ⚡','A few hours of sleep, a few hours of glory. Let’s go!!'],
+ 'Early Wake|Revision':['The Schedule Your Future Self Needs 💤','You’re practically done. Sleep well, champ!!'],
+ 'Sleep Split|Cold start':['Operation: Don’t Fail 🎯','Study hard, sleep fast, pretend you’re fine. Classic!!'],
+ 'Sleep Split|Partial':['One Night. One Chance. Let’s Go. ✂️','Split the night, own the exam. You’ve got this!!'],
+ 'Sleep Split|Revision':['The Final Stretch 🌗','Quick nap, quick revision, quick victory. Easy!!']
+ };
+ return combos[plan+'|'+prep]||['Your Battle Plan 🗺️','You’ve got this. See you on the other side!!'];
+}
+function makeSchedule(topics,plan,wakeTime,includeBreaks,includeSleep,prep){
+ const now=new Date(); now.setSeconds(0,0);
+ const start= new Date(now); start.setMinutes(now.getMinutes()+((15-now.getMinutes()%15)%15));
+ const next=(h,m=0)=>nextTime(now,h,m);
+ const b=breakDuration(prep), nap=napDuration(topics), schedule=[];
+ let current=start;
+ const studyBlock=(limit)=>{
+   for(let i=0;i<topics.length;i++){
+     const mins=duration(topics[i]);
+     if(addMinutes(current,mins)>limit) break;
+     const end=addMinutes(current,mins); schedule.push({type:'study',start:current,end,label:topics[i]}); current=end;
+     if(includeBreaks&&i<topics.length-1){
+       const nextStudy=duration(topics[i+1]);
+       if(addMinutes(current,b+nextStudy)<=limit){
+         const be=addMinutes(current,b); schedule.push({type:'break',start:current,end:be,label:'Break'}); current=be;
+       }
+     }
+   }
+   if(current<limit) schedule.push({type:'free',start:current,end:limit,label:'Time to cover the missed questions'});
+ };
+ if(plan==='All Nighter'){
+   const ns=next(2,30), ne=addMinutes(ns,nap);
+   studyBlock(ns); schedule.push({type:'sleep',start:ns,end:ne,label:`Power Nap — ${nap} mins`});
+   let re=next(6,0); if(re<=ne)re.setDate(re.getDate()+1);
+   schedule.push({type:'revision',start:ne,end:re,label:'Final Revision — All Topics'});
+ }else if(plan==='Early Wake'){
+   if(includeSleep){schedule.push({type:'sleep',start:current,end:wakeTime,label:'Sleep'});current=wakeTime;}
+   else current=wakeTime;
+   studyBlock(next(6,0));
+ }else{
+   const ss=next(2,0); let se=next(5,0); if(se<=ss)se.setDate(se.getDate()+1);
+   let re=next(6,0); if(re<=se)re.setDate(re.getDate()+1);
+   studyBlock(ss); schedule.push({type:'sleep',start:ss,end:se,label:'Sleep'});
+   schedule.push({type:'revision',start:se,end:re,label:'Final Revision — All Topics'});
+ }
+ schedule.push({type:'leave',start:next(6,0),end:null,label:'Leave for College'});
+ return schedule;
+}
+const colors={study:'#4ade80',break:'#facc15',sleep:'#818cf8',free:'#fb923c',revision:'#38bdf8',leave:'#f472b6'};
+const icons={study:'📖',break:'☕',sleep:'😴',free:'🔄',revision:'⚡',leave:'🚌'};
+function generate(){
+ $('formError').textContent=''; $('topicError').textContent='';
+ const topics=[...document.querySelectorAll('.topic-check:checked')].map(x=>x.value);
+ if(!topics.length){$('topicError').textContent='Select at least one pending part to generate your schedule.';return;}
+ const plan=document.querySelector('input[name="sleepPlan"]:checked').value;
+ const prep=document.querySelector('input[name="prep"]:checked').value;
+ let wake=null,includeBreaks=true,includeSleep=false;
+ if(plan==='Early Wake'){
+   const now=new Date(); wake=new Date(now); wake.setHours(Number($('wakeHour').value),Number($('wakeMinute').value),0,0);
+   if(wake<now)wake.setDate(wake.getDate()+1);
+   const h=Number($('wakeHour').value),m=Number($('wakeMinute').value);
+   includeBreaks=h<3; includeSleep=h<2||(h===2&&m===0);
+ }
+ const schedule=makeSchedule(topics,plan,wake,includeBreaks,includeSleep,prep);
+ completed=new Set(); studyTotal=schedule.filter(x=>x.type==='study').length;
+ const [title,motivation]=getCombo(plan,prep);
+ $('resultTitle').textContent=title; $('resultMotivation').textContent=motivation;
+ $('bottomMotivation').textContent='"'+motivation+'"';
+ $('vitals').innerHTML='';
+ [['Sleep plan',plan],['Breaks',includeBreaks?'Included':'Not included'],['Sleep hours',includeSleep?'Included':plan==='Sleep Split'?'Included':'Not included'],['Prep level',prep]].forEach(([a,b])=>{
+   const d=document.createElement('div');d.className='vital';d.innerHTML=`<small>${a}</small><strong></strong>`;d.querySelector('strong').textContent=b;$('vitals').append(d);
+ });
+ $('topicSummary').innerHTML='';
+ topics.forEach(t=>{const p=document.createElement('span');p.className='pill';p.textContent=t;$('topicSummary').append(p);});
+ $('schedule').innerHTML='';
+ schedule.forEach((item,i)=>{
+   const row=document.createElement('div');row.className='slot'+(item.type==='study'?' study':'');
+   row.style.setProperty('--slot-color',colors[item.type]);
+   const time=item.end?`${timeText(item.start)} — ${timeText(item.end)}`:timeText(item.start);
+   row.innerHTML=`<div class="slot-icon">${icons[item.type]}</div><div class="slot-info"><div class="slot-time"></div><div class="slot-label"></div></div><span class="tag">${item.type.toUpperCase()}</span>`;
+   row.querySelector('.slot-time').textContent=time;row.querySelector('.slot-label').textContent=item.label;
+   if(item.type==='study'){
+     row.title='Click to mark this study topic as done';
+     row.addEventListener('click',()=>{
+       if(completed.has(i))return;completed.add(i);row.classList.add('done');
+       const stamp=document.createElement('div');stamp.className='slot-time';stamp.textContent='✓ Done at '+timeText(new Date());row.querySelector('.slot-info').append(stamp);
+       updateProgress();
+     });
+   }
+   $('schedule').append(row);
+ });
+ updateProgress();
+ $('generatedAt').textContent='Generated at '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+' · Good luck · You’ve got this';
+ $('inputScreen').classList.add('hidden');$('resultScreen').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateProgress(){
+ $('progressFill').style.width=(studyTotal?completed.size/studyTotal*100:0)+'%';
+ $('progressCount').textContent=completed.size+' / '+studyTotal+' topics done';
+}
+$('generateBtn').addEventListener('click',generate);
+$('editBtn').addEventListener('click',()=>{$('resultScreen').classList.add('hidden');$('inputScreen').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});});
+$('printBtn').addEventListener('click',()=>window.print());
+</script>
+</body>
+</html>
